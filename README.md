@@ -89,7 +89,7 @@ hydra -l adminn -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.28 -t 4 -V
 
 Vérification du bannissement de l'IP attaquante et lecture des traces dans les logs système.
 
-![Bannissement de l'attaquant](screenshots/Ban_de_l_attaquant.png)
+![Bannissement de l'attaquant](screenshots/Ban_de_l'attaquant.png)
 
 ![Logs des tentatives d'attaque](screenshots/log_des_tentatives_d'attaque.png)
 
