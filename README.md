@@ -17,7 +17,7 @@ Mettre en place un laboratoire virtuel simulant une infrastructure réelle, avec
 ## 🏗️ Architecture du Lab
 ```
 ┌─────────────────────────────────────────┐
-│           Réseau virtuel (Bridge)       │
+│              Réseau virtuel             │
 │                                         │
 │  ┌─────────────────┐  ┌───────────────┐ │
 │  │  Ubuntu Server  │  │  Kali Linux   │ │
