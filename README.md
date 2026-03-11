@@ -8,20 +8,23 @@
 ## 📌 Objectif
 
 Mettre en place un laboratoire virtuel simulant une infrastructure réelle, avec :
-- Un serveur Linux vulnérable (cible)
+- Un serveur Linux (cible)
 - Une machine attaquante (Kali Linux)
 - Des mécanismes de détection et de blocage automatique
 
 ---
 
 ## 🏗️ Architecture du Lab
+
 ```
 ┌─────────────────────────────────────────┐
 │              Réseau virtuel             │
 │                                         │
 │  ┌─────────────────┐  ┌───────────────┐ │
 │  │  Ubuntu Server  │  │  Kali Linux   │ │
+│  │  (Victime)      │  │  (Attaquant)  │ │
 │  │  192.168.1.28   │  │  192.168.1.29 │ │
+│  │                 │  │               │ │
 │  │  - SSH (port 22)│  │  - Hydra      │ │
 │  │  - Apache       │  │  - Nmap       │ │
 │  │  - Fail2Ban     │  │               │ │
@@ -48,60 +51,83 @@ Mettre en place un laboratoire virtuel simulant une infrastructure réelle, avec
 ## 📋 Étapes réalisées
 
 ### Phase 1 — Mise en place de l'environnement
-- Installation et configuration de VirtualBox
-- Déploiement d'Ubuntu Server 24.04 LTS
-- Déploiement de Kali Linux 2025
-- Configuration du réseau bridge
-- Vérification de la connectivité (ping entre les deux machines)
 
-### Phase 2 — Sécurisation du serveur
-- Installation et démarrage du service SSH
-- Installation d'Apache2
-- Installation et configuration de Fail2Ban
-- Configuration du jail SSH
+Configuration du réseau bridge avec les deux VMs sur le même sous-réseau (`192.168.1.0/24`).
 
-### Phase 3 — Simulation d'attaque
-- Brute force SSH depuis Kali avec **Hydra** sur la wordlist `rockyou.txt`
-- Observation du blocage automatique par Fail2Ban après 3 tentatives
-
-### Phase 4 — Analyse des logs
-- Lecture des tentatives dans `/var/log/auth.log`
-- Vérification du bannissement dans `/var/log/fail2ban.log`
-- Confirmation de l'IP bannie via `fail2ban-client status sshd`
+![IPs des deux machines](screenshots/IP_des_machines.png)
 
 ---
 
-## 🔍 Résultats
-```bash
-sudo fail2ban-client status sshd
+### Phase 2 — Sécurisation du serveur
 
-# Status for the jail: sshd
-# |- Currently failed: 0
-# |  Total failed: 24
-# `- Currently banned: 1
-#    Banned IP list: 192.168.1.29
+Installation et démarrage du service SSH sur Ubuntu, puis configuration de Fail2Ban :
+- `maxretry = 3` → bannissement après 3 tentatives échouées
+- `bantime = 3600` → bannissement d'1 heure
+- `findtime = 600` → fenêtre de détection de 10 minutes
+
+![SSH actif sur Ubuntu](screenshots/SSH_actif_sur_ubuntu.png)
+
+![Fail2Ban actif sur Ubuntu](screenshots/Fail2Ban_actif_sur_ubuntu.png)
+
+---
+
+### Phase 3 — Simulation d'attaque brute force SSH
+
+Depuis Kali Linux, lancement d'une attaque brute force SSH avec **Hydra** sur la wordlist `rockyou.txt` (14 millions de mots de passe réels).
+
+```bash
+hydra -l adminn -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.28 -t 4 -V
 ```
 
-**L'IP de Kali a été automatiquement bannie après 3 tentatives échouées.**
+**Fail2Ban a automatiquement bloqué l'attaque** après 3 tentatives échouées.
+
+![Attaque Hydra bloquée par Fail2Ban](screenshots/Attaque_Kali_Fail.png)
+
+---
+
+### Phase 4 — Analyse des logs
+
+Vérification du bannissement de l'IP attaquante et lecture des traces dans les logs système.
+
+![Bannissement de l'attaquant](screenshots/Ban_de_l_attaquant.png)
+
+![Logs des tentatives d'attaque](screenshots/log_des_tentatives_d_attaque.png)
+
+---
+
+## 🔍 Résultat
+
+```
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 1
+|  |- Total failed:     4
+`- Actions
+   |- Currently banned: 1
+   `- Banned IP list:   192.168.1.29
+```
+
+**L'IP de Kali (192.168.1.29) a été automatiquement bannie après 3 tentatives échouées.**
 
 ---
 
 ## 📚 Compétences développées
 
-- Administration Linux (systemctl, journalctl, apt, nano)
+- Administration Linux (`systemctl`, `journalctl`, `apt`, `nano`)
 - Gestion des services et des logs système
-- Configuration de Fail2Ban
-- Notions de réseau (IP, ports, SSH)
+- Configuration de pare-feu applicatif (Fail2Ban)
+- Notions de réseau (IP, ports, SSH, ping)
 - Utilisation d'outils offensifs en environnement isolé (Hydra)
-- Analyse de logs d'intrusion
+- Analyse de logs d'intrusion (`auth.log`, `fail2ban.log`)
 
 ---
 
 ## 🚀 Améliorations prévues
 
-- [ ] Ajout d'Auditd pour logger toutes les commandes système
-- [ ] Scan de ports avec Nmap depuis Kali
-- [ ] Mise en place d'un SIEM léger (ELK Stack)
+- Ajout d'Auditd pour logger toutes les commandes système
+- Scan de ports avec Nmap depuis Kali
+- Mise en place d'un SIEM léger (ELK Stack)
+- Rédaction de règles Snort/Suricata personnalisées
 
 ---
 
