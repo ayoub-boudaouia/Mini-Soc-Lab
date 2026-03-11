@@ -1,4 +1,4 @@
-🛡️ Mini SOC Lab — Cybersecurity Home Lab
+#🛡️ Mini SOC Lab — Cybersecurity Home Lab
 
 📌 Objectif
 Mettre en place un laboratoire virtuel simulant une infrastructure réelle, avec :
