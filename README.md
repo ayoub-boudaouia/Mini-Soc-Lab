@@ -91,7 +91,7 @@ Vérification du bannissement de l'IP attaquante et lecture des traces dans les 
 
 ![Bannissement de l'attaquant](screenshots/Ban_de_l_attaquant.png)
 
-![Logs des tentatives d'attaque](screenshots/log_des_tentatives_d_attaque.png)
+![Logs des tentatives d'attaque](screenshots/log_des_tentatives_d'attaque.png)
 
 ---
 
